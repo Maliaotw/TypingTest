@@ -7,7 +7,7 @@ wavs = [{'key': '7519.wav',
 
 data = {
     'topic': topic,
-    'wav_path': '7519.wav',
-    'msg': '休息一下...',
+    'wav_path': {'exercise': '7519.wav', 'test': '7519.wav'},
+    'msg': {'exercise': '練習結束,休息一下...', 'test': '考試結束,休息一下...'},
     'wavs': wavs
 }

@@ -5,21 +5,24 @@ from wx.adv import Sound
 import datetime
 from src.base import chkfile, whire_output_html
 
+from wx.stc import StyledTextCtrl
+
 class TestDialog(wx.Dialog):
     '''
     測驗功能 Dialog
     '''
 
-    def __init__(self, parent, min,report=True):
+    def __init__(self, parent, min,report=True,test=True):
         wx.Dialog.__init__(self, parent, wx.ID_ANY, title="", size=(600, 550), style=wx.CAPTION)
 
         self.data = chkfile('data.pkl')
         self.topic = self.data.get('topic')
-        self.sound = Sound(self.data.get('wav_path'))
-        self.msg = self.data.get('msg')
+        # self.sound = Sound(self.data.get('wav_path'))
+        # self.msg = self.data.get('msg')
         self.Title = '測驗%s分鐘' % (str(int(min)))
         self.min = min
         self.report = report
+        self.test = test
 
         self.initUI()
         self.bind_evt()
@@ -35,7 +38,7 @@ class TestDialog(wx.Dialog):
         self.Label_Max = wx.StaticText(self, label="字數：", pos=(280, 5), size=(-1, -1))
         self.Label_Max.SetFont(wx.Font(12, 75, 90, 90, False, "MingLiU"))
 
-        self.Label_MaxString = wx.StaticText(self, label=str(len(self.topic)), pos=(330, 5), size=(-1, -1))
+        self.Label_MaxString = wx.StaticText(self, label='', pos=(330, 5), size=(-1, -1))
         self.Label_MaxString.SetFont(wx.Font(12, 75, 90, 90, False, "MingLiU"))
 
         self.Label_OK = wx.StaticText(self, label="正確：", pos=(380, 5), size=(-1, -1))
@@ -66,6 +69,7 @@ class TestDialog(wx.Dialog):
                                          pos=(20, 270), size=(550, 200), style=0 | wx.TE_MULTILINE)
         self.m_staticText2.SetFont(wx.Font(16, 75, 90, 90, False, "MingLiU"))
         self.m_staticText2.SetMaxLength(self.m_staticText1.LastPosition)
+
 
         self.CDtime = self.Label_CD.GetLabel()
         h, self.min, s = self.CDtime.split(":")
@@ -116,15 +120,22 @@ class TestDialog(wx.Dialog):
         # 驗證測試結果
         data = self.marktopic()
 
+        self.Label_MaxString.SetLabel(data.get('max'))
         self.Label_OkString.SetLabel(data.get('ok'))
         self.Label_MissString.SetLabel(data.get('miss'))
         self.Label_AvgString.SetLabel(data.get('avg'))
         if self.report:
-            whire_output_html(self.startdate, data)
-        self.sound.Play()
+            whire_output_html(self.filename, data)
+            sound = Sound(self.data['wav_path']['test'])
+            msg = self.data['msg']['test']
+        else:
+            sound = Sound(self.data['wav_path']['exercise'])
+            msg = self.data['msg']['exercise']
+
+        sound.Play()
 
         # 結束彈窗
-        dig = MsgDialog(self, self.msg)
+        dig = MsgDialog(self, msg)
         dig.ShowModal()
         dig.Destroy()
         self.EndModal(wx.ID_OK)
