@@ -13,7 +13,19 @@ icons = [{'key': 'icon.ico',
 data = {
     'topic': topic,
     'wav_path': {'exercise': '7519.wav', 'test': '7519.wav'},
-    'msg': {'exercise': '練習結束,休息一下...', 'test': '測驗結束'},
+    'msg': {
+        'exercise':
+            {
+                'title': '練習結束',
+                'msg': '視窗關閉後即開始進行2分鐘測驗'
+            },
+        'test':
+            {
+                'title': '測驗結束',
+                'msg': '視窗關閉後即開始進行2分鐘測驗'
+            }
+
+    },
     'wavs': wavs,
     'icons': icons,
 }

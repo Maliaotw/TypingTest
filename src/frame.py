@@ -15,6 +15,8 @@ class MyFrame1(wx.Frame):
         wx.Frame.__init__(self, None, id=wx.ID_ANY, title="中文打字測驗", pos=wx.DefaultPosition, size=wx.Size(510, 300),
                           style=wx.CAPTION | wx.CLOSE_BOX | wx.MINIMIZE_BOX | wx.TAB_TRAVERSAL)
 
+
+
         # loc = wx.IconLocation(r'icon.ico', 0)
         icon = wx.EmptyIcon()
         icon.CopyFromBitmap(wx.Bitmap(r'icon.ico', wx.BITMAP_TYPE_ANY))
@@ -76,11 +78,13 @@ class MyFrame1(wx.Frame):
 
         # Menu1
         self.Menu1 = wx.Menu()
-        self.menuExercise_Msg = wx.MenuItem(self.Menu1, 11, "練習結束提醒")
-        self.Menu1.AppendItem(self.menuExercise_Msg)
-        self.menuTest_Msg = wx.MenuItem(self.Menu1, 12, "測驗結束提醒")
-        self.Menu1.AppendItem(self.menuTest_Msg)
-        self.m_menubar.Append(self.Menu1, "提醒")
+
+
+        # self.menuExercise_Msg = wx.MenuItem(self.Menu1, 11, "練習結束提醒")
+        # self.Menu1.AppendItem(self.menuExercise_Msg)
+        # self.menuTest_Msg = wx.MenuItem(self.Menu1, 12, "測驗結束提醒")
+        # self.Menu1.AppendItem(self.menuTest_Msg)
+        # self.m_menubar.Append(self.Menu1, "提醒")
 
         # Menu 2
         self.Menu2 = wx.Menu()
@@ -106,8 +110,8 @@ class MyFrame1(wx.Frame):
 
     def bindMenuEvent(self):
 
-        self.Bind(wx.EVT_MENU, self.OnExercise_Msg, id=11)
-        self.Bind(wx.EVT_MENU, self.OnTest_Msg, id=12)
+        # self.Bind(wx.EVT_MENU, self.OnExercise_Msg, id=11)
+        # self.Bind(wx.EVT_MENU, self.OnTest_Msg, id=12)
 
         self.Bind(wx.EVT_MENU, self.OnExercise_Wav, id=21)
         self.Bind(wx.EVT_MENU, self.OnTest_Wav, id=22)
@@ -141,7 +145,6 @@ class MyFrame1(wx.Frame):
         # self.startdate = time.strftime("%Y%m%d%H%M")
 
         date_now = datetime.datetime.now()
-
 
         date = '{Y}年{M}月{D}日 {h}時{m}分'.format(
             **{
@@ -224,6 +227,8 @@ class MyFrame1(wx.Frame):
             self.data['wav_path']['test'] = dlg.Path
             whirefile("data.pkl", self.data)
 
+
+
         dlg.Destroy()
 
     def OnExercise_Msg(self, event):
@@ -272,8 +277,18 @@ class MyFrame1(wx.Frame):
 
         # dialog = TestDialog(self, wav_path=self.data.get('wav_path'), msg=self.data.get('msg'), min='2')
 
-        for i in range(2):
-            dig = TestDialog(self, min='2')
+        loop_num = 2
+
+        finish_num = list(range(loop_num)).pop() + 1
+
+        for i in range(loop_num):
+
+            if i+1 == finish_num:
+                # 最後一次
+                dig = TestDialog(self, min='2', finish=True)
+            else:
+                dig = TestDialog(self, min='2')
+
             dig.filename = self.filename
 
             if dig.ShowModal() == wx.ID_OK:

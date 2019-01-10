@@ -7,22 +7,24 @@ from src.base import chkfile, whire_output_html
 
 from wx.stc import StyledTextCtrl
 
+
 class TestDialog(wx.Dialog):
     '''
     測驗功能 Dialog
     '''
 
-    def __init__(self, parent, min,report=True,test=True):
+    def __init__(self, parent, min, report=True, finish=False):
         wx.Dialog.__init__(self, parent, wx.ID_ANY, title="", size=(600, 550), style=wx.CAPTION)
 
         self.data = chkfile('data.pkl')
         self.topic = self.data.get('topic')
+
+        self.finish = finish
         # self.sound = Sound(self.data.get('wav_path'))
         # self.msg = self.data.get('msg')
         self.Title = '測驗%s分鐘' % (str(int(min)))
         self.min = min
         self.report = report
-        self.test = test
 
         self.initUI()
         self.bind_evt()
@@ -32,7 +34,7 @@ class TestDialog(wx.Dialog):
         wx.StaticText(self, label="剩餘時間", pos=(60, 10), size=(-1, -1)).SetFont(
             wx.Font(16, 75, 90, 90, False, "MingLiU"))
 
-        self.Label_CD = wx.StaticText(self, label="00:{}:00".format(self.min), pos=(160, 10), size=(-1, -1))
+        self.Label_CD = wx.StaticText(self, label="{}:00".format(self.min), pos=(160, 10), size=(-1, -1))
         self.Label_CD.SetFont(wx.Font(16, 75, 90, 90, False, "MingLiU"))
 
         self.Label_Max = wx.StaticText(self, label="字數：", pos=(280, 5), size=(-1, -1))
@@ -71,11 +73,9 @@ class TestDialog(wx.Dialog):
 
         # self.m_staticText2.SetMaxLength(self.m_staticText1.LastPosition) # 取消控制字數
 
-
-
         self.CDtime = self.Label_CD.GetLabel()
-        h, self.min, s = self.CDtime.split(":")
-        self.CDendtime = datetime.datetime.now() + datetime.timedelta(hours=int(h), minutes=int(self.min),
+        self.min, s = self.CDtime.split(":")
+        self.CDendtime = datetime.datetime.now() + datetime.timedelta(hours=int(0), minutes=int(self.min),
                                                                       seconds=int(s))
 
     def bind_evt(self):
@@ -117,7 +117,7 @@ class TestDialog(wx.Dialog):
         '''
         print("OnStop")
         self.timeCD.Stop()
-        self.Label_CD.SetLabel('00：00：00')
+        self.Label_CD.SetLabel('00：00')
 
         # 驗證測試結果
         data = self.marktopic()
@@ -126,18 +126,29 @@ class TestDialog(wx.Dialog):
         self.Label_OkString.SetLabel(data.get('ok'))
         self.Label_MissString.SetLabel(data.get('miss'))
         self.Label_AvgString.SetLabel(data.get('avg'))
+
         if self.report:
             whire_output_html(self.filename, data)
             sound = Sound(self.data['wav_path']['test'])
-            msg = self.data['msg']['test']
+            msg_data = self.data['msg']['test']
         else:
             sound = Sound(self.data['wav_path']['exercise'])
-            msg = self.data['msg']['exercise']
+            msg_data = self.data['msg']['exercise']
 
         sound.Play()
 
         # 結束彈窗
-        dig = MsgDialog(self, msg)
+
+        if self.finish:
+            msg_data = {
+                'title': '測驗結束',
+                'msg': '測驗結束'
+            }
+
+            dig = MsgDialog(self, msg_data,center=True)
+        else:
+            dig = MsgDialog(self, msg_data)
+
         dig.ShowModal()
         dig.Destroy()
         self.EndModal(wx.ID_OK)
@@ -202,14 +213,17 @@ class TestDialog(wx.Dialog):
 
         if diff.total_seconds() <= 0:
             self.Label_CD.SetLabel(self.CDtime)
-            h, min, s = self.CDtime.split(":")
-            self.CDendtime = self.CDendtime + datetime.timedelta(hours=int(h), minutes=int(min), seconds=int(s))
+            min, s = self.CDtime.split(":")
+            self.CDendtime = self.CDendtime + datetime.timedelta(hours=int(0), minutes=int(min), seconds=int(s))
             self.OnStop(event)
 
             # if self.ChkBox_CDAlart.Value: self.OnAboutDig(event)
         else:
             # print('diff', diff)
-            self.Label_CD.SetLabel(str(diff).split('.')[0])
+
+            hms_text = str(diff).split('.')[0]
+            ms = hms_text.split(':')[-2:]
+            self.Label_CD.SetLabel(":".join(ms))
 
 
 class MsgDialog(wx.Dialog):
@@ -217,52 +231,52 @@ class MsgDialog(wx.Dialog):
     消息框 MsgDialog
     '''
 
-    def __init__(self, parent, msg):
+    def __init__(self, parent, msg_data, center=False):
         wx.Dialog.__init__(self, parent, wx.ID_ANY, title="", size=(350, 115), style=wx.CAPTION | wx.CLOSE_BOX)
 
-        self.SetTitle("Massage")
-        self.msg = msg
+        self.SetTitle(msg_data.get('title'))
+
+        self.msg = msg_data.get('msg')
+
+        if center:
+            self.msg_pos = (135, 25)
+        else:
+            self.msg_pos = (40,25)
+
         self.initUI()
 
     def initUI(self):
-        self.Label_1 = wx.StaticText(self, label=self.msg, pos=(40, 25), size=(-1, -1))
-        self.Label_1.SetFont(wx.Font(16, 75, 90, 90, False, "MingLiU"))
+        self.Label_1 = wx.StaticText(self, label=self.msg, pos=self.msg_pos, size=(-1, -1))
+        self.Label_1.SetFont(wx.Font(12, 75, 90, 90, False, "SimSun"))
 
-        self.Label_2 = wx.StaticText(self, label=self.msg, pos=(200, 50), size=(-1, -1))
-        self.Label_2.SetFont(wx.Font(16, 75, 90, 90, False, "MingLiU"))
+        self.Label_2 = wx.StaticText(self, label=self.msg, pos=self.msg_pos, size=(-1, -1))
+        self.Label_2.SetFont(wx.Font(12, 75, 90, 90, False, "SimSun"))
         self.Label_2.Hide()
-
-
 
 
 class TopicDialog(wx.Dialog):
     '''
     修改題目 Dig
     '''
+
     def __init__(self, parent):
-        wx.Dialog.__init__(self, parent, wx.ID_ANY, title="修改題目", size=(550, 550), style=wx.CAPTION|wx.CLOSE_BOX)
+        wx.Dialog.__init__(self, parent, wx.ID_ANY, title="修改題目", size=(550, 550), style=wx.CAPTION | wx.CLOSE_BOX)
 
         self.data = chkfile('data.pkl')
 
         self.initUI()
 
-
     def initUI(self):
-        m_StaticText1 = wx.StaticText(self,label='題目', pos=(20,20), size=(-1,-1), style=0)
+        m_StaticText1 = wx.StaticText(self, label='題目', pos=(20, 20), size=(-1, -1), style=0)
         m_StaticText1.SetFont(wx.Font(16, 75, 90, 90, False, "MingLiU"))
 
-        self.m_TextCtrl1 = wx.TextCtrl(self,value=self.data.get('topic'), pos=(20,60), size=(500,350), style=wx.TE_MULTILINE)
-
+        self.m_TextCtrl1 = wx.TextCtrl(self, value=self.data.get('topic'), pos=(20, 60), size=(500, 350),
+                                       style=wx.TE_MULTILINE)
 
         btn_EDIT = wx.Button(self, wx.ID_ANY, "修改", (200, 420), wx.Size(100, 60), 0)
 
-        btn_EDIT.Bind(wx.EVT_BUTTON,self.OnStart)
+        btn_EDIT.Bind(wx.EVT_BUTTON, self.OnStart)
 
-    def OnStart(self,event):
+    def OnStart(self, event):
         self.EndModal(wx.ID_EDIT)
-
-
-
-
-
 
