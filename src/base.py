@@ -50,9 +50,9 @@ def whire_output(filename, data):
     file_path = os.path.join(chkdir(conf.LOG_DIR), "%s.txt" % filename)
 
     f = open(file_path, 'a+')
-    f.write('## 測試結果\n')
+    f.write('## 測驗結果\n')
     f.write('作答：%s\n' % data.get('fix_view'))
-    f.write('測試時間：%s\n' % data.get('min'))
+    f.write('測驗時間：%s\n' % data.get('min'))
     f.write('字數統計：%s\n' % data.get('max'))
     f.write('正確字數：%s\n' % data.get('ok'))
     f.write('錯誤字數：%s\n' % data.get('miss'))
@@ -64,9 +64,9 @@ def whire_output_html(filename, data):
     file_path = os.path.join(chkdir(conf.LOG_DIR), "%s.html" % filename)
 
     f = open(file_path, 'a+')
-    f.write('<h2>測試結果</h2>')
+    f.write('<h2>測驗結果</h2>')
     f.write('<p>作答：%s</p>' % data.get('fix_view'))
-    f.write('<p>測試時間：%s分鐘 ' % data.get('min'))
+    f.write('<p>測驗時間：%s分鐘 ' % data.get('min'))
     f.write('字數統計：%s ' % data.get('max'))
     f.write('正確字數：%s ' % data.get('ok'))
     f.write('錯誤字數：%s ' % data.get('miss'))
@@ -86,10 +86,21 @@ def create_output_html(filename, topic):
 def chk_wavs():
     # cwd = os.getcwd()
     for wav in conf.wavs:
-        print(wav)
+        # print(wav)
         name = wav.get('key')
         if os.path.isfile(name):
             pass
         else:
             with open(name, 'wb') as f:
                 f.write(wav.get('val'))
+
+def chk_icons():
+    # cwd = os.getcwd()
+    for icon in conf.icons:
+        # print(wav)
+        name = icon.get('key')
+        if os.path.isfile(name):
+            pass
+        else:
+            with open(name, 'wb') as f:
+                f.write(icon.get('val'))

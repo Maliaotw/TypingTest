@@ -1,4 +1,4 @@
 
 
-f = open('7519.wav','rb')
-print({'key':'7519.wav','val':f.read()})
+f = open('icon.ico','rb')
+print({'key':'icon.ico','val':f.read()})

@@ -68,7 +68,9 @@ class TestDialog(wx.Dialog):
         self.m_staticText2 = wx.TextCtrl(self, wx.ID_ANY, value="",
                                          pos=(20, 270), size=(550, 200), style=0 | wx.TE_MULTILINE)
         self.m_staticText2.SetFont(wx.Font(16, 75, 90, 90, False, "MingLiU"))
-        self.m_staticText2.SetMaxLength(self.m_staticText1.LastPosition)
+
+        # self.m_staticText2.SetMaxLength(self.m_staticText1.LastPosition) # 取消控制字數
+
 
 
         self.CDtime = self.Label_CD.GetLabel()
@@ -142,7 +144,7 @@ class TestDialog(wx.Dialog):
 
     def marktopic(self):
         '''
-        驗證測試結果
+        驗證測驗結果
         :return:
         '''
 

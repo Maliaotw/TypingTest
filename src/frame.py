@@ -7,15 +7,22 @@ from data import conf
 from src.base import chkfile, whirefile, create_output_html, log_path
 from src.mydialog import TestDialog, MsgDialog, TopicDialog
 import os
+import datetime
 
 
 class MyFrame1(wx.Frame):
     def __init__(self):
-        wx.Frame.__init__(self, None, id=wx.ID_ANY, title="測試打字", pos=wx.DefaultPosition, size=wx.Size(300, 200),
+        wx.Frame.__init__(self, None, id=wx.ID_ANY, title="中文打字測驗", pos=wx.DefaultPosition, size=wx.Size(510, 300),
                           style=wx.CAPTION | wx.CLOSE_BOX | wx.MINIMIZE_BOX | wx.TAB_TRAVERSAL)
 
-        self.SetBackgroundColour('White')
+        # loc = wx.IconLocation(r'icon.ico', 0)
+        icon = wx.EmptyIcon()
+        icon.CopyFromBitmap(wx.Bitmap(r'icon.ico', wx.BITMAP_TYPE_ANY))
 
+        self.SetIcon(icon)
+        self.SetBackgroundColour((246, 222, 116))
+
+        # self.Ba
         # --- Default
         # 沒有的話就新增
         self.data = chkfile('data.pkl')
@@ -30,15 +37,27 @@ class MyFrame1(wx.Frame):
         # --- 标题 小區塊
 
         self.Label_Name1 = wx.StaticText(
-            self, wx.ID_ANY, "測試打字小程序", (45, 5), wx.Size(-1, -1), 0
+            self, wx.ID_ANY, "中文打字測驗", (170, 5), wx.Size(-1, -1), 0
         )
-        self.Label_Name1.SetFont(wx.Font(18, wx.DECORATIVE, wx.ITALIC, wx.NORMAL))
+
+        self.Label_Name1.SetFont(wx.Font(14, 75, 90, wx.BOLD, False, "SimSun"))
+
+        body_text = '練習時間: \n點擊下方【開始】視窗後，將開始計時進行5分鐘中文打字練習。 \n\n測驗時間: \n練習結束後，即進行兩次測驗，每次測驗時間2分鐘，\n取最高平均字數為測驗結果。 \n\n測驗說明: \n請注意若有漏字和多字，該行後續之所有字元將被視為錯字。'
+
+        self.Label_Name2 = wx.StaticText(
+            self, wx.ID_ANY, body_text, (30, 40), wx.Size(-1, -1), 0
+        )
+
+        self.Label_Name2.SetFont(wx.Font(12, 75, 90, 90, False, "SimSun"))
+        # self.Label_Name2.Hide()
+
+        #  wxFont( 14, wxFONTFAMILY_ROMAN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("PMingLiU") ) );
 
         # --- 功能 btn
 
         #  Exercise Test_btn
         #  Exercise Test_btn
-        self.btn_Start = wx.Button(self, wx.ID_ANY, "開始", (100, 60), wx.Size(60, -1), 0)
+        self.btn_Start = wx.Button(self, wx.ID_ANY, "開始", (200, 200), wx.Size(60, -1), 0)
         self.btn_Exercise = wx.Button(self, wx.ID_ANY, "練習", (77, 60), wx.Size(60, -1), 0)
         self.btn_Exercise.Hide()
         self.btn_Test = wx.Button(self, wx.ID_ANY, "測驗", (147, 60), wx.Size(60, -1), 0)
@@ -51,6 +70,9 @@ class MyFrame1(wx.Frame):
     def menuUI(self):
 
         self.m_menubar = wx.MenuBar(0)
+        # self.m_menubar.SetBackgroundColour((246, 222, 116))
+        self.m_menubar.SetForegroundColour((246, 222, 116))
+        self.m_menubar.SetBackgroundColour((246, 222, 116))
 
         # Menu1
         self.Menu1 = wx.Menu()
@@ -84,19 +106,18 @@ class MyFrame1(wx.Frame):
 
     def bindMenuEvent(self):
 
-
         self.Bind(wx.EVT_MENU, self.OnExercise_Msg, id=11)
         self.Bind(wx.EVT_MENU, self.OnTest_Msg, id=12)
 
         self.Bind(wx.EVT_MENU, self.OnExercise_Wav, id=21)
         self.Bind(wx.EVT_MENU, self.OnTest_Wav, id=22)
 
-
         self.Bind(wx.EVT_MENU, self.OnOpenSetting, id=31)
 
         self.Bind(wx.EVT_MENU, self.OnTopicSetting, id=41)
 
     def bindEvent(self):
+
         self.btn_Start.Bind(wx.EVT_BUTTON, self.OnStart)
         self.btn_Exercise.Bind(wx.EVT_BUTTON, self.OnExercise)
         self.btn_Test.Bind(wx.EVT_BUTTON, self.OnTest)
@@ -118,7 +139,22 @@ class MyFrame1(wx.Frame):
 
         # --- 創建報告
         # self.startdate = time.strftime("%Y%m%d%H%M")
-        self.filename = "%s %s" % (time.strftime("%Y%m%d%H%M"), name)
+
+        date_now = datetime.datetime.now()
+
+
+        date = '{Y}年{M}月{D}日 {h}時{m}分'.format(
+            **{
+                'Y': date_now.year,
+                'M': date_now.month,
+                'D': date_now.day,
+                'h': date_now.hour,
+                'm': date_now.minute
+            }
+        )
+
+        self.filename = "%s %s" % (date, name)
+
         create_output_html(self.filename, self.topic)
 
         self.OnExercise(event)
@@ -134,7 +170,7 @@ class MyFrame1(wx.Frame):
         dig.Title = "輸入密碼"
 
         if dig.ShowModal() == wx.ID_OK:
-            if dig.Value == '123456':
+            if dig.Value == conf.PASSWORD:
                 dig = TopicDialog(self)
                 if dig.ShowModal() == wx.ID_EDIT:
                     self.data['topic'] = dig.m_TextCtrl1.GetValue()
@@ -154,7 +190,7 @@ class MyFrame1(wx.Frame):
         dig.Title = "輸入密碼"
 
         if dig.ShowModal() == wx.ID_OK:
-            if dig.Value == '123456':
+            if dig.Value == conf.PASSWORD:
                 os.system("explorer %s" % log_path(conf.LOG_DIR))
         dig.Destroy()
 
@@ -165,7 +201,8 @@ class MyFrame1(wx.Frame):
         :return:
         '''
 
-        dlg = wx.FileDialog(self, "聲音檔案路徑", defaultFile=self.data.get('wav_path').get('exercise'), wildcard="Wav files (*.wav)|*.wav")
+        dlg = wx.FileDialog(self, "聲音檔案路徑", defaultFile=self.data.get('wav_path').get('exercise'),
+                            wildcard="Wav files (*.wav)|*.wav")
 
         if dlg.ShowModal() == wx.ID_OK:
             self.data['wav_path']['exercise'] = dlg.Path
@@ -180,15 +217,14 @@ class MyFrame1(wx.Frame):
         :return:
         '''
 
-        dlg = wx.FileDialog(self, "聲音檔案路徑", defaultFile=self.data.get('wav_path').get('test'), wildcard="Wav files (*.wav)|*.wav")
+        dlg = wx.FileDialog(self, "聲音檔案路徑", defaultFile=self.data.get('wav_path').get('test'),
+                            wildcard="Wav files (*.wav)|*.wav")
 
         if dlg.ShowModal() == wx.ID_OK:
             self.data['wav_path']['test'] = dlg.Path
             whirefile("data.pkl", self.data)
 
         dlg.Destroy()
-
-
 
     def OnExercise_Msg(self, event):
         '''
@@ -221,9 +257,9 @@ class MyFrame1(wx.Frame):
         dlg.Destroy()
 
     def OnExercise(self, event):
-        print("Exercise 测验10分钟")
+        print("Exercise 测验5分钟")
 
-        dialog = TestDialog(self, min='10', report=False)
+        dialog = TestDialog(self, min='5', report=False)
 
         dialog.filename = self.filename
 
@@ -236,7 +272,7 @@ class MyFrame1(wx.Frame):
 
         # dialog = TestDialog(self, wav_path=self.data.get('wav_path'), msg=self.data.get('msg'), min='2')
 
-        for i in range(3):
+        for i in range(2):
             dig = TestDialog(self, min='2')
             dig.filename = self.filename
 
