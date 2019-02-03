@@ -181,7 +181,8 @@ class TestDialog(wx.Dialog):
             'max': str(ok + miss),
             'ok': str(ok),
             'miss': str(miss),
-            'avg': str((ok + miss) / int(self.min)),
+            # 20190204 修改平均字數計算方式 正確/分鐘
+            'avg': str(ok / int(self.min)),
             'fix_view': "".join(fix),
             'min': str(self.min)
         }

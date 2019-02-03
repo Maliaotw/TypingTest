@@ -30,7 +30,7 @@ class MyFrame1(wx.Frame):
         self.data = chkfile('data.pkl')
 
         # self.topic = random.choice(conf.data.get('topic'))
-        self.topic = self.data.get('topic')
+        # self.topic = self.data.get('topic')
 
         # print(self.startdate)
 
@@ -137,6 +137,9 @@ class MyFrame1(wx.Frame):
         dlg = wx.TextEntryDialog(self, '輸入您的姓名', "輸入姓名")
         # dlg.SetValue()
 
+        name = ''
+
+
         if dlg.ShowModal() == wx.ID_OK:
             name = dlg.GetValue()
         dlg.Destroy()
@@ -144,24 +147,26 @@ class MyFrame1(wx.Frame):
         # --- 創建報告
         # self.startdate = time.strftime("%Y%m%d%H%M")
 
-        date_now = datetime.datetime.now()
 
-        date = '{Y}年{M}月{D}日 {h}時{m}分'.format(
-            **{
-                'Y': date_now.year,
-                'M': date_now.month,
-                'D': date_now.day,
-                'h': date_now.hour,
-                'm': date_now.minute
-            }
-        )
+        if name:
+            date_now = datetime.datetime.now()
 
-        self.filename = "%s %s" % (date, name)
+            date = '{Y}年{M}月{D}日 {h}時{m}分'.format(
+                **{
+                    'Y': date_now.year,
+                    'M': date_now.month,
+                    'D': date_now.day,
+                    'h': date_now.hour,
+                    'm': date_now.minute
+                }
+            )
 
-        create_output_html(self.filename, self.topic)
+            self.filename = "%s %s" % (date, name)
 
-        self.OnExercise(event)
-        self.OnTest(event)
+            create_output_html(self.filename, self.data['topic'])
+
+            self.OnExercise(event)
+            self.OnTest(event)
 
     def OnTopicSetting(self, event):
         '''

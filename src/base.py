@@ -47,7 +47,7 @@ def whire_output(filename, data):
     :param data: 測試完返回的字典
     :return:
     '''
-    file_path = os.path.join(chkdir(conf.LOG_DIR), "%s.txt" % filename)
+    file_path = os.path.join(chkdir(conf.LOG_DIR), "%s.txt" % filename )
 
     f = open(file_path, 'a+')
     f.write('## 測驗結果\n')
